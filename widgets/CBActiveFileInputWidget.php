@@ -93,7 +93,7 @@ class CBActiveFileInputWidget extends CWidget
 
 		if ($this->renderPreview) {
 			if ( ($previewUrl = $this->activeFile->getFileUrl())) {
-				echo '<div>'.CHtml::link('Preview existing file', $previewUrl, array('target'=>'_blank')).'</div>';
+				echo '<div>'.CHtml::link('<i class="icon-eye-open"></i> Preview existing file', $previewUrl, array('target'=>'_blank')).'</div>';
 			}
 		}
 	}
