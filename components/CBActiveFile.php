@@ -7,7 +7,7 @@
  * @property string $extensionsCsv Csv representation of $extensions.
  * @property string $inputFileFieldName Html name for input file field.
  *
- * @since 1.0
+ * @since 1.1
  * @package Components
  * @author Konstantinos Filios <konfilios@gmail.com>
  */
@@ -60,6 +60,16 @@ class CBActiveFile extends CComponent
 	 * @var integer
 	 */
 	public $pixelHeight;
+	/**
+	 * Maximum pixel width.
+	 * @var integer
+	 */
+	public $maxPixelWidth;
+	/**
+	 * Maximum pixel height.
+	 * @var integer
+	 */
+	public $maxPixelHeight;
 	/**
 	 * Maximum file size in bytes.
 	 * @var integer
@@ -208,7 +218,7 @@ class CBActiveFile extends CComponent
 	public function rules()
 	{
 		return array(
-			array('label, contentType, extensionsCsv, pixelWidth, pixelHeight, description, maxBytesize', 'safe')
+			array('label, contentType, extensionsCsv, pixelWidth, pixelHeight, maxPixelWidth, maxPixelHeight, description, maxBytesize', 'safe')
 		);
 	}
 
@@ -230,6 +240,9 @@ class CBActiveFile extends CComponent
 
 		if ($this->pixelWidth && $this->pixelHeight) {
 			$restrictions[] = 'Dimensions: '.$this->pixelWidth.'x'.$this->pixelHeight;
+
+		} else if ($this->maxPixelWidth && $this->maxPixelHeight) {
+			$restrictions[] = 'Max Dimensions: '.$this->maxPixelWidth.'x'.$this->maxPixelHeight;
 		}
 
 		return implode(",\n", $restrictions);
@@ -275,6 +288,40 @@ class CBActiveFile extends CComponent
 		// Check extension validity
 		if (!empty($this->_extensions) && !in_array(strtolower($uploadedFile->extensionName), $this->_extensions)) {
 			throw new CHttpException(400, 'Uploaded file "'.$this->getLabel().'" may only be of specific types: '.$this->extensionsCsv);
+		}
+
+		if ($this->pixelWidth || $this->pixelHeight || $this->maxPixelWidth || $this->maxPixelHeight) {
+			list($actualWidth, $actualHeight, $actualType, $actualAttr) = getimagesize($uploadedFile->tempName);
+
+			$actualWidth = intval($actualWidth);
+			$actualHeight = intval($actualHeight);
+
+			if ($actualWidth && $actualHeight) {
+
+				// Exact width
+				if ($this->pixelWidth && ($actualWidth != $this->pixelWidth)) {
+					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
+							.'" width should be eactly '.$this->pixelWidth.'px, not '.$actualWidth.'px');
+				}
+
+				// Exact height
+				if ($this->pixelHeight && ($actualHeight != $this->pixelHeight)) {
+					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
+							.'" height should be eactly '.$this->pixelHeight.'px, not '.$actualHeight.'px');
+				}
+
+				// Max width
+				if ($this->maxPixelWidth && ($actualWidth > $this->maxPixelWidth)) {
+					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
+							.'" width should be at most '.$this->maxPixelWidth.'px, not '.$actualWidth.'px');
+				}
+
+				// Max height
+				if ($this->maxPixelHeight && ($actualHeight > $this->maxPixelHeight)) {
+					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
+							.'" height should be at most '.$this->maxPixelHeight.'px, not '.$actualHeight.'px');
+				}
+			}
 		}
 
 		return $uploadedFile;
