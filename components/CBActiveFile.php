@@ -301,13 +301,13 @@ class CBActiveFile extends CComponent
 				// Exact width
 				if ($this->pixelWidth && ($actualWidth != $this->pixelWidth)) {
 					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
-							.'" width should be eactly '.$this->pixelWidth.'px, not '.$actualWidth.'px');
+							.'" width should be exactly '.$this->pixelWidth.'px, not '.$actualWidth.'px');
 				}
 
 				// Exact height
 				if ($this->pixelHeight && ($actualHeight != $this->pixelHeight)) {
 					throw new CHttpException(400, 'Uploaded file "'.$this->getLabel()
-							.'" height should be eactly '.$this->pixelHeight.'px, not '.$actualHeight.'px');
+							.'" height should be exactly '.$this->pixelHeight.'px, not '.$actualHeight.'px');
 				}
 
 				// Max width
